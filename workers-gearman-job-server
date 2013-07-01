@@ -1,0 +1,52 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+import os
+import os.path
+import sys
+PATH_WITH_EN_WORKERS = '/var/workers/workers-enabled'
+PATH_WITH_PIDS = '/var/workers/pids'
+DEFAULT_USER_AND_GROUP = 'www-data'
+def main():
+    if (len(sys.argv) < 2):
+	viewhelp()
+	exit()
+    if (sys.argv[1] == 'start'):
+	start(force=False)
+    if (sys.argv[1] == 'force-start'):
+	start(force=True)	
+    elif (sys.argv[1] == 'stop'): 
+	stop(force=False)
+    elif (sys.argv[1] == 'force-stop'): 
+	stop(force=True)
+    elif (sys.argv[1] == 'restart'): 
+	stop()
+	start()
+    else:
+	viewhelp()
+
+def start(force=False):
+    print "Start workers.....\n"
+    files = os.listdir(PATH_WITH_EN_WORKERS)
+    for  f in files:
+	if (os.path.exists(PATH_WITH_PIDS+'/'+f+'.pid') ):
+	    print f+"... seem allready running (use force-start)\n"
+	    if (not force):
+		continue
+	os.system('su '+DEFAULT_USER_AND_GROUP+' -c '+PATH_WITH_EN_WORKERS+'/'+f)
+	print f+"\n"
+
+def stop(force=False):
+    print "Stop workers......\n"
+    pids = os.listdir(PATH_WITH_PIDS)
+    for pid in pids:
+	add_kill_param = ''
+	if (force):
+	    add_kill_param = ' -9 '
+	print pid
+	
+	os.system('kill '+add_kill_param+' ')
+def viewhelp():
+    print "\n\n(start|force-start|stop|force-stop|restart)\n\n"
+
+if (__name__=="__main__"):
+    main()
