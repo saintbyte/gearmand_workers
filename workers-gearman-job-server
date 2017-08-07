@@ -3,9 +3,11 @@
 import os
 import os.path
 import sys
-PATH_WITH_EN_WORKERS = '/var/workers/workers-enabled'
-PATH_WITH_PIDS = '/var/workers/pids'
+WORK_DIR = '/var/workers'
+PATH_WITH_EN_WORKERS = WORK_DIR+'/workers-enabled'
+PATH_WITH_PIDS = WORK_DIR+'/pids'
 DEFAULT_USER_AND_GROUP = 'www-data'
+os.chdir(WORK_DIR)
 def main():
     if (len(sys.argv) < 2):
 	viewhelp()
@@ -37,14 +39,13 @@ def start(force=False):
 
 def stop(force=False):
     print "Stop workers......\n"
-    pids = os.listdir(PATH_WITH_PIDS)
-    for pid in pids:
+    pid_files = os.listdir(PATH_WITH_PIDS)
+    for pid_file in pid_files:
 	add_kill_param = ''
 	if (force):
 	    add_kill_param = ' -9 '
-	print pid
-	
-	os.system('kill '+add_kill_param+' ')
+	pid = open(pid_file).read()
+	os.system('kill '+add_kill_param+' '+pid)
 def viewhelp():
     print "\n\n(start|force-start|stop|force-stop|restart)\n\n"
 
